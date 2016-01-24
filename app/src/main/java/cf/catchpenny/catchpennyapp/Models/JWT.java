@@ -1,12 +1,24 @@
 package cf.catchpenny.catchpennyapp.Models;
 
-/**
- * Created by mbtam on 12/10/2015.
- */
-public class JWT {
-    public String token;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-    public JWT(String token) {
+public class JWT {
+    @SerializedName("token")
+    @Expose
+    private String token;
+
+    /**
+     * @return The token
+     */
+    public String getToken() {
+        return token;
+    }
+
+    /**
+     * @param token The token
+     */
+    public void setToken(String token) {
         this.token = token;
     }
 }

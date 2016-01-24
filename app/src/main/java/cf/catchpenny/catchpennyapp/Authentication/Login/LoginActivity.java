@@ -3,20 +3,22 @@ package cf.catchpenny.catchpennyapp.Authentication.Login;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 import cf.catchpenny.catchpennyapp.HomeActivity;
 import cf.catchpenny.catchpennyapp.Models.JWT;
 import cf.catchpenny.catchpennyapp.R;
 import cf.catchpenny.catchpennyapp.REST.RESTClient;
+import cf.catchpenny.catchpennyapp.REST.ServiceGenerator;
 import retrofit.Call;
 import retrofit.Callback;
-import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
@@ -26,17 +28,13 @@ public class LoginActivity extends AppCompatActivity {
     public static final String TAG = LoginActivity.class.getSimpleName();
     private ProgressDialog mProgress;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(getString(R.string.jwt));
-        editor.apply();
+        getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit().remove(getString(R.string.jwt)).apply();
 
         Log.d(TAG, "Removed token from preferences");
 
@@ -72,14 +70,7 @@ public class LoginActivity extends AppCompatActivity {
         String email = ((EditText) findViewById(R.id.email_editText)).getText().toString();
         String password = ((EditText) findViewById(R.id.password_editText)).getText().toString();
 
-        // Create a very simple REST adapter which points to the API.
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(API_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        // Create an instance of our RESTClient interface.
-        RESTClient client = retrofit.create(RESTClient.class);
+        RESTClient client = ServiceGenerator.createService(RESTClient.class);
 
         Log.d(TAG, "Email: " + email);
         Log.d(TAG, "Password: " + password);
@@ -91,28 +82,37 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response<JWT> response, Retrofit retrofit1) {
                 if (response.isSuccess()) {
-                    // request successful (status code h200w200, 201)
-
+                    // request successful (status code 200, 201)
                     JWT jwt = response.body();
 
-                    SharedPreferences sharedPref = getSharedPreferences(
-                            getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.jwt), jwt.token);
-                    editor.apply();
+                    getSharedPreferences(
+                            getString(R.string.preference_file_key), Context.MODE_PRIVATE).
+                            edit()
+                            .putString(getString(R.string.jwt), jwt.getToken())
+                            .apply();
 
-                    Log.d(TAG, "Token recieved: " + jwt.token);
+                    Calendar rightNow = Calendar.getInstance();
+                    rightNow.add(Calendar.DATE, 1);
+                    long expiryDate = rightNow.getTimeInMillis();
 
-                    Intent intent = new Intent(context, HomeActivity.class);
-                    startActivity(intent);
+                    getSharedPreferences(
+                            getString(R.string.preference_file_key), Context.MODE_PRIVATE).
+                            edit()
+                            .putLong("Expiry", expiryDate)
+                            .apply();
+
+                    Log.d(TAG, "Token recieved: " + jwt.getToken());
+
+                    startActivity(new Intent(context, HomeActivity.class));
 
                     if (mProgress.isShowing())
                         mProgress.dismiss();
-
                 } else {
                     //request not successful (like 400,401,403 etc)
-                    //Handle errors
-                    Log.e(TAG, response.raw().toString());
+                    if (response.code() == 401) {
+                        Toast.makeText(LoginActivity.this, "Email/Password incorrect. Please retype.", Toast.LENGTH_SHORT).show();
+                    }
+
                     if (mProgress.isShowing())
                         mProgress.dismiss();
                 }
@@ -120,20 +120,12 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Throwable t) {
+                // Could not even connect to server
                 if (mProgress.isShowing())
                     mProgress.dismiss();
+
+                Toast.makeText(LoginActivity.this, "Please check your connection", Toast.LENGTH_SHORT).show();
             }
         });
     }
-
-    /*public void retrieveToken(View view) {
-
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        if (sharedPref.contains(getString(R.string.jwt))) {
-            String token = sharedPref.getString(getString(R.string.jwt), "No Token");
-            Log.d(TAG, "Token retrieved from Preferences: " + token);
-        }
-
-    }*/
 }

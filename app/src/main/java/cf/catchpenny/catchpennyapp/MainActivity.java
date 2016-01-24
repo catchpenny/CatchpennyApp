@@ -2,10 +2,13 @@ package cf.catchpenny.catchpennyapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 import cf.catchpenny.catchpennyapp.Authentication.Login.LoginActivity;
 
@@ -25,6 +28,21 @@ public class MainActivity extends AppCompatActivity {
             // we could end up with overlapping fragments.
             if (savedInstanceState != null) {
                 return;
+            }
+
+            long expDate;
+            Calendar now = Calendar.getInstance();
+            SharedPreferences sharedPref = getSharedPreferences(
+                    getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            if (sharedPref.contains("Expiry")) {
+                expDate = sharedPref.getLong("Expiry", 0);
+                boolean isExpired = now.after(expDate);
+
+                if (isExpired) {
+                    Toast.makeText(MainActivity.this, "Login Expired", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Login Valid", Toast.LENGTH_SHORT).show();
+                }
             }
 
             LandingFragment fragment = new LandingFragment();

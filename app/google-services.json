@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_id": "catchpenny-1200",
+    "project_number": "941963512142",
+    "name": "Catchpenny"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:941963512142:android:a11521853b3631ce",
+        "client_id": "android:cf.catchpenny.catchpennyapp",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "cf.catchpenny.catchpennyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "941963512142-o446e78qne8gqji88uomem3vagdno95l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cf.catchpenny.catchpennyapp",
+            "certificate_hash": "3AD5CF8E866EA18F463958BB88F4161B11770A6B"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-72835115-1"
+          }
+        },
+        "cloud_messaging_service": {
+          "status": 2,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

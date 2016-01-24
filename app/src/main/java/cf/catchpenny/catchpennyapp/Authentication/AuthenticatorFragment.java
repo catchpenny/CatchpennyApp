@@ -1,16 +1,13 @@
 package cf.catchpenny.catchpennyapp.Authentication;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.app.Fragment;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.EditText;
 
 import cf.catchpenny.catchpennyapp.Models.JWT;
 import cf.catchpenny.catchpennyapp.R;
 import cf.catchpenny.catchpennyapp.REST.RESTClient;
-
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
@@ -54,10 +51,10 @@ public class AuthenticatorFragment extends Fragment {
                     SharedPreferences sharedPref = getActivity().getSharedPreferences(
                             getString(R.string.preference_file_key), Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.jwt), jwt.token);
+                    editor.putString(getString(R.string.jwt), jwt.getToken());
                     editor.apply();
 
-                    Log.d(TAG, "Token recieved: " + jwt.token);
+                    Log.d(TAG, "Token recieved: " + jwt.getToken());
                 } else {
                     //request not successful (like 400,401,403 etc)
                     //Handle errors
